@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Profil Utilisateur</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-gauche">
+      <a href="/"><img src="/images/home.png" alt="Accueil" class="icon-home"></a>
+    </div>
+    <div class="header-centre">
+      <h1>Mon Profil</h1>
+    </div>
+    <div class="header-droite"></div>
+  </header>
+
+  <section class="profil-section">
+    <h2>Mes réservations</h2>
+    <div id="reservations" class="logements">
+      <!-- Réservations chargées par JavaScript -->
+    </div>
+  </section>
+
+  <script>
+    // Charger les réservations depuis localStorage
+    const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+
+    const container = document.getElementById('reservations');
+
+    if (reservations.length === 0) {
+      container.innerHTML = '<p>Aucune réservation effectuée.</p>';
+    } else {
+      reservations.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'logement';
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.titre}">
+          <h2>${item.titre}</h2>
+          <p>${item.prix} €/nuit</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
