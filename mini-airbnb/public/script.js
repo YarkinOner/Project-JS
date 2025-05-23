@@ -1,4 +1,3 @@
-// Barre de recherche
 const rechercheInput = document.getElementById('recherche');
 rechercheInput?.addEventListener('input', () => {
   const terme = rechercheInput.value.toLowerCase();
@@ -8,7 +7,6 @@ rechercheInput?.addEventListener('input', () => {
   });
 });
 
-// Gestion des favoris avec localStorage
 const coeurs = document.querySelectorAll('.coeur');
 let favoris = JSON.parse(localStorage.getItem('favoris')) || [];
 
@@ -36,9 +34,8 @@ coeurs.forEach(coeur => {
   });
 });
 
-MAJ_COEURS(); // Initialise à l'ouverture
+MAJ_COEURS();
 
-// Filtrage des favoris
 const btnFavoris = document.getElementById('btnFavoris');
 let afficherFavoris = false;
 

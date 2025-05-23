@@ -19,12 +19,10 @@
   <section class="profil-section">
     <h2>Mes réservations</h2>
     <div id="reservations" class="logements">
-      <!-- Réservations chargées par JavaScript -->
     </div>
   </section>
 
   <script>
-    // Charger les réservations depuis localStorage
     const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
 
     const container = document.getElementById('reservations');

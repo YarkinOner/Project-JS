@@ -2,12 +2,10 @@ const express = require('express');
 const app = express();
 const path = require('path');
 
-// Configuration
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
 
-// Données simulées
 const logements = [
   { 
     id: 1, 
@@ -65,26 +63,34 @@ const logements = [
   }
 ];
 
-// Routes
+const reservations = [
+  {
+    image: '/images/paris.jpg',
+    titre: 'Appartement à Paris',
+    prix: 120
+  },
+  {
+    image: '/images/nice.jpg',
+    titre: 'Maison à Nice',
+    prix: 90
+  }
+];
 
-// Accueil
+
 app.get('/', (req, res) => {
   res.render('accueil', { logements });
 });
 
-// Détail d'un logement
 app.get('/logement/:id', (req, res) => {
   const logement = logements.find(l => l.id === parseInt(req.params.id));
   if (!logement) return res.status(404).send('Logement non trouvé');
   res.render('detail', { logement });
 });
 
-// Profil utilisateur (réservations)
 app.get('/profil', (req, res) => {
-  res.render('profil');
+  res.render('profil', { reservations });
 });
 
-// Lancement du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Serveur lancé sur http://localhost:${PORT}`);
