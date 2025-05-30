@@ -1,10 +1,13 @@
 const express = require('express');
-const app = express();
+const fs = require('fs');
 const path = require('path');
 
+const app = express();
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+
+const reservationsFile = path.join(__dirname, 'reservations.json');
 
 const logements = [
   { 
@@ -63,19 +66,12 @@ const logements = [
   }
 ];
 
-const reservations = [
-  {
-    image: '/images/paris.jpg',
-    titre: 'Appartement à Paris',
-    prix: 120
-  },
-  {
-    image: '/images/nice.jpg',
-    titre: 'Maison à Nice',
-    prix: 90
-  }
-];
 
+
+
+if (!fs.existsSync(reservationsFile)) {
+  fs.writeFileSync(reservationsFile, '[]');
+}
 
 app.get('/', (req, res) => {
   res.render('accueil', { logements });
@@ -84,14 +80,74 @@ app.get('/', (req, res) => {
 app.get('/logement/:id', (req, res) => {
   const logement = logements.find(l => l.id === parseInt(req.params.id));
   if (!logement) return res.status(404).send('Logement non trouvé');
-  res.render('detail', { logement });
+
+  const reservations = JSON.parse(fs.readFileSync(reservationsFile, 'utf-8'));
+  const datesReservees = reservations
+    .filter(r => r.logementId === logement.id)
+    .flatMap(r => {
+      const start = new Date(r.start);
+      const end = new Date(r.end);
+      const dates = [];
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d).toISOString().split('T')[0]);
+      }
+      return dates;
+    });
+
+  res.render('detail', { logement, datesReservees });
 });
 
-app.get('/profil', (req, res) => {
-  res.render('profil', { reservations });
+app.post('/reserver', (req, res) => {
+  const { logementId, start, end } = req.body;
+  const logement = logements.find(l => l.id === parseInt(logementId));
+
+  if (!logement) return res.status(400).send('Logement invalide');
+
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const diff = (endDate - startDate) / (1000 * 60 * 60 * 24);
+
+  if (isNaN(diff) || diff < 0 || diff > 7) {
+    return res.status(400).send('La réservation doit être entre 1 et 7 jours.');
+  }
+
+  const nouvelleReservation = {
+    logementId: parseInt(logementId),
+    titre: logement.titre,
+    image: logement.image,
+    prix: logement.prix,
+    start,
+    end,
+    dateReservation: new Date().toISOString()
+  };
+
+  const reservations = JSON.parse(fs.readFileSync(reservationsFile));
+  reservations.push(nouvelleReservation);
+  fs.writeFileSync(reservationsFile, JSON.stringify(reservations, null, 2));
+
+  res.redirect('/mes-reservations');
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur lancé sur http://localhost:${PORT}`);
+app.get('/mes-reservations', (req, res) => {
+  const reservations = JSON.parse(fs.readFileSync(reservationsFile));
+  res.render('mes-reservations', { reservations });
+});
+
+app.post('/annuler/:id', (req, res) => {
+  const id = req.params.id;
+  let reservations = JSON.parse(fs.readFileSync(reservationsFile));
+
+  const nouvelleListe = reservations.filter(r => r.dateReservation !== id);
+
+  if (nouvelleListe.length === reservations.length) {
+    return res.status(404).send("Réservation non trouvée.");
+  }
+
+  fs.writeFileSync(reservationsFile, JSON.stringify(nouvelleListe, null, 2));
+  res.json({ success: true });
+
+});
+
+app.listen(3000, () => {
+  console.log("Serveur lancé sur http://localhost:3000");
 });

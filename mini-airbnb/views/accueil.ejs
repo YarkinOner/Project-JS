@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>Mini Airbnb</title>
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span id="modal-close" class="modal-close">&times;</span>
-      <div id="modal-images" class="modal-images"></div>
-    </div>
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span id="modal-close" class="modal-close">&times;</span>
+    <div id="modal-images" class="modal-images"></div>
   </div>
+</div>
 
-  <header class="main-header">
+<body>
+  <header>
     <div class="header-gauche">
-      <img src="/images/home.png" alt="Accueil" class="icon-home">
+      <img src="/mini-airbnb/public/images/home.png" alt="Accueil" class="icon-home">
     </div>
 
     <div class="header-centre">
@@ -24,9 +23,11 @@
     </div>
 
     <div class="header-droite">
-      <button id="btnFavoris">❤️ Favoris</button>
-      <button>👤 Profil</button>
-    </div>
+  <button id="btnFavoris">❤️ Favoris</button>
+  <a href="/mes-reservations"><button>📅 Réservations</button></a>
+  <button>👤 Profil</button>
+</div>
+
   </header>
 
   <h1>Liste des logements</h1>
@@ -34,15 +35,16 @@
   <div class="logements">
     <% logements.forEach(logement => { %>
       <div class="logement" data-titre="<%= logement.titre.toLowerCase() %>">
-        <a href="/logement/<%= logement.id %>">
-          <img src="<%= logement.image %>" alt="<%= logement.titre %>">
-        </a>
-        <h2>
-          <a href="/logement/<%= logement.id %>"><%= logement.titre %></a>
-          <span class="coeur" data-id="<%= logement.id %>">♡</span>
-        </h2>
-        <p><%= logement.prix %> €/nuit</p>
-      </div>
+  <a href="/logement/<%= logement.id %>">
+    <img src="<%= logement.image %>" alt="<%= logement.titre %>">
+  </a>
+  <h2>
+    <a href="/logement/<%= logement.id %>"><%= logement.titre %></a>
+    <span class="coeur" data-id="<%= logement.id %>">♡</span>
+  </h2>
+  <p><%= logement.prix %> €/nuit</p>
+</div>
+
     <% }); %>
   </div>
 
